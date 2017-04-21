@@ -1,0 +1,82 @@
+﻿sql CreateAll
+{
+    CREATE TABLE IF NOT EXISTS Category
+	(
+		Id Language PRIMARY KEY NOT NULL, 
+		Name Text NOT NULL
+	);
+
+	CREATE TABLE IF NOT EXISTS Product
+	(
+		Id TEXT PRIMARY KEY NOT NULL,
+		CategoryId TEXT NOT NULL, 		
+		Name Text NOT NULL
+	);
+	
+	CREATE TABLE IF NOT EXISTS Language
+	(
+	    Id TEXT PRIMARY KEY NOT NULL, 
+	    Name Text NOT NULL
+	);
+	
+	CREATE TABLE IF NOT EXISTS Item
+	(
+		Id TEXT PRIMARY KEY NOT NULL,
+		ProductId  TEXT     NOT NULL, 
+		LanguageId TEXT     NOT NULL, 		
+		Name       TEXT     NOT NULL, 
+		Time       DATETIME NOT NULL, 
+		Url        TEXT     NOT NULL, 
+		Size       TEXT     NOT NULL, 
+		FileName   TEXT     NOT NULL, 
+		SHA1       TEXT     NOT NULL
+	);
+}
+
+sql View
+{
+	SELECT 
+		Category.Name AS Category, 
+		Product.Name  AS Product, 
+		Item.Name     AS Name, 
+		Item.Url      AS Url, 
+		Item.Time     AS PostTime, 
+		Language.Name AS Language, 
+		Item.Size     AS Size, 
+		Item.FileName AS FileName, 
+		Item.SHA1     AS SHA1
+	FROM Item
+	JOIN Language ON Item.LanguageId    = Language.Id
+	JOIN Product  ON Item.ProductId     = Product.Id
+	JOIN Category ON Product.CategoryId = Category.Id
+}
+
+sql AddCategory
+{
+	INSERT OR IGNORE INTO Category(Id, Name) VALUES(@Id, @Name);
+}
+
+sql AddProduct
+{
+	INSERT OR IGNORE INTO Product(Id, CategoryId, Name) VALUES(@Id, @CategoryId, @Name);
+}
+
+sql AddLanguage
+{
+	INSERT OR IGNORE INTO Language(Id, Name) VALUES(@Id, @Name);
+}
+
+sql AddItem
+{
+	INSERT OR IGNORE INTO Item VALUES(@Id, @ProductId, @LanguageId, @Name, @Time, @Url, '0', '-', '-');
+}
+
+sql GetItem
+{
+	SELECT * FROM Item;
+}
+
+sql SetItemDetails
+{
+	UPDATE Item SET Size = @Size, FileName = @FileName, SHA1 = @SHA1 WHERE Id = @Id;
+}
